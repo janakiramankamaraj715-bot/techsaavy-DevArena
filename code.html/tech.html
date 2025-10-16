@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Workforce Intelligence System</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fade-in {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeOutUp {
+      from { opacity: 1; transform: translateY(0); }
+      to { opacity: 0; transform: translateY(-30px); }
+    }
+
+    .animate-fade-in { animation: fade-in 0.6s ease-out; }
+    .fade-in-up { animation: fadeInUp 1s ease-out forwards; }
+    .fade-out-up { animation: fadeOutUp 0.7s ease forwards; }
+
+    .role-card {
+      transition: all 0.3s ease;
+    }
+    .role-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 25px #C3CDE6;
+      border-color: #C3CDE6 !important;
+    }
+
+    body {
+      background: linear-gradient(135deg, #C3CDE6, #D3D3D3, #F5F5DC);
+      font-family: 'Inter', sans-serif;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    .tab.active {
+      background: linear-gradient(to right, #6366f1, #818cf8);
+      color: white !important;
+      transform: scale(1.05);
+    }
+    .tab {
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      box-shadow: 0 10px 25px rgba(90, 90, 150, 0.25);
+      transform: scale(1.03);
+      transition: 0.3s ease;
+    }
+
+    .profile-pic {
+      transition: transform 0.5s ease;
+    }
+    .profile-pic:hover {
+      transform: scale(1.1);
+    }
+
+    .upload-btn {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+    }
+    
+    .upload-btn input[type=file] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    .profile-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    .profile-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      cursor: pointer;
+    }
+
+    .profile-container:hover .profile-overlay {
+      opacity: 1;
+    }
+
+    .profile-overlay-text {
+      color: white;
+      font-weight: bold;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen text-gray-800">
+  <!-- LOGIN PAGE -->
+  <div id="loginPage" class="min-h-screen flex items-center justify-center p-4 relative">
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <div class="absolute top-20 left-10 w-64 h-64 bg-[#C3CDE6] rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-pulse"></div>
+      <div class="absolute bottom-20 right-10 w-96 h-96 bg-[#F5F5DC] rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-pulse"></div>
+    </div>
+
+    <div class="w-full max-w-6xl relative animate-fade-in">
+      <div class="text-center mb-8">
+        <div class="flex items-center justify-center gap-3 mb-4">
+          <div class="w-12 h-12 bg-gradient-to-br from-[#C3CDE6] to-[#D3D3D3] rounded-xl flex items-center justify-center shadow-lg">
+            <i data-lucide="users" class="w-7 h-7 text-gray-700"></i>
+          </div>
+          <h1 class="text-4xl font-bold text-gray-800">Workforce Intelligence System</h1>
+        </div>
+      </div>
+
+      <!-- Main Card -->
+      <div class="bg-[#F5F5DC]/70 backdrop-blur-lg rounded-2xl shadow-2xl p-8 border border-[#D3D3D3]/70">
+        <h2 class="text-3xl font-bold text-gray-800 mb-2">Choose your role</h2>
+        <p class="text-gray-600 mb-8">Sign in to access your personalized dashboard.</p>
+
+        <!-- Role Cards -->
+        <div class="grid md:grid-cols-2 gap-6" id="roleCards"></div>
+
+        <!-- Login Form -->
+        <div class="mt-8 max-w-md mx-auto">
+          <div class="bg-white/70 rounded-xl p-6 border border-[#D3D3D3]">
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+              <input id="username" type="text"
+                class="w-full px-4 py-3 bg-[#F5F5DC]/60 border border-[#D3D3D3] rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:border-[#C3CDE6] focus:ring-2 focus:ring-[#C3CDE6]/40 transition-all"
+                placeholder="Enter your username">
+            </div>
+
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+              <input id="password" type="password"
+                class="w-full px-4 py-3 bg-[#F5F5DC]/60 border border-[#D3D3D3] rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:border-[#C3CDE6] focus:ring-2 focus:ring-[#C3CDE6]/40 transition-all"
+                placeholder="Enter your password">
+            </div>
+
+            <button id="loginBtn"
+              class="w-full bg-gradient-to-r from-[#C3CDE6] to-[#D3D3D3] hover:from-[#b0b8e0] hover:to-[#c9c9c9] text-gray-800 font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-[#C3CDE6]/40">
+              Login as Worker
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center mt-6">
+        <a href="#" class="text-gray-600 hover:text-[#C3CDE6] transition-colors text-sm">Need help? Contact support</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- MANAGER DASHBOARD -->
+  <div id="managerDashboard" class="hidden max-w-7xl mx-auto p-5 space-y-6">
+    <!-- Header -->
+    <header class="bg-white rounded-2xl p-5 shadow flex justify-between items-center">
+      <div class="flex items-center gap-4">
+        <div class="bg-gradient-to-br from-indigo-400 to-indigo-600 text-white w-12 h-12 flex items-center justify-center text-2xl rounded-xl">🏭</div>
+        <div>
+          <h1 class="text-xl font-bold">Workforce Intelligence System</h1>
+          <p class="text-gray-500 text-sm">Industry 4.0 Smart Task Assignment</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="text-right">
+          <div class="font-semibold">Manager Dashboard</div>
+          <div class="text-gray-500 text-sm">John Smith</div>
+        </div>
+        <div class="bg-indigo-100 text-indigo-600 w-10 h-10 rounded-full flex items-center justify-center font-bold">JS</div>
+        <button id="managerLogoutBtn" class="ml-4 bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md">Logout</button>
+      </div>
+    </header>
+
+    <!-- Navigation Buttons -->
+    <nav class="bg-white p-4 rounded-2xl shadow flex flex-wrap gap-4 justify-center">
+      <button class="tab active flex items-center gap-2 px-5 py-2 rounded-full bg-indigo-500 text-white font-medium shadow hover:shadow-lg transition-all" data-target="#workersSection">
+        📊 <span>Dashboard</span>
+      </button>
+      <button class="tab flex items-center gap-2 px-5 py-2 rounded-full bg-gray-100 hover:bg-indigo-100 text-gray-700 font-medium shadow transition-all" data-target="#workersSection">
+        👷 <span>Workers</span>
+      </button>
+      <button class="tab flex items-center gap-2 px-5 py-2 rounded-full bg-gray-100 hover:bg-indigo-100 text-gray-700 font-medium shadow transition-all" data-target="#tasksSection">
+        📋 <span>Tasks</span>
+      </button>
+      <button class="tab flex items-center gap-2 px-5 py-2 rounded-full bg-gray-100 hover:bg-indigo-100 text-gray-700 font-medium shadow transition-all" data-target="#analyticsSection">
+        📈 <span>Analytics</span>
+      </button>
+    </nav>
+
+    <!-- Dashboard Sections -->
+    <div id="workersSection" class="scroll-mt-20">
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+        <div class="bg-white p-5 rounded-2xl shadow text-center">
+          <div class="text-4xl">👷</div>
+          <div id="totalWorkers" class="text-3xl font-bold mt-2">48</div>
+          <p class="text-gray-500 text-sm">Total Workers</p>
+        </div>
+        <div class="bg-white p-5 rounded-2xl shadow text-center">
+          <div class="text-4xl">✅</div>
+          <div id="availableWorkers" class="text-3xl font-bold mt-2">32</div>
+          <p class="text-gray-500 text-sm">Available Workers</p>
+        </div>
+        <div class="bg-white p-5 rounded-2xl shadow text-center">
+          <div class="text-4xl">⚡</div>
+          <div id="activeTasks" class="text-3xl font-bold mt-2">15</div>
+          <p class="text-gray-500 text-sm">Active Tasks</p>
+        </div>
+        <div class="bg-white p-5 rounded-2xl shadow text-center">
+          <div class="text-4xl">📒</div>
+          <div id="efficiency" class="text-3xl font-bold mt-2">8</div>
+          <p class="text-gray-500 text-sm">Reports</p>
+        </div>
+      </div>
+
+      <div class="grid lg:grid-cols-3 gap-6 mt-6">
+        <section class="bg-white rounded-2xl p-5 shadow lg:col-span-2">
+          <h2 class="font-semibold text-lg mb-4">Available Workers</h2>
+          <div id="workerList" class="space-y-3 max-h-[500px] overflow-y-auto"></div>
+        </section>
+
+        <section id="analyticsSection" class="bg-white rounded-2xl p-5 shadow">
+          <h2 class="font-semibold text-lg mb-4">AI Task Assignment</h2>
+          <div class="space-y-3">
+            <input id="taskName" placeholder="Task name" class="w-full border p-2 rounded-md">
+            <select id="taskSkill" class="w-full border p-2 rounded-md">
+              <option value="">Select skill</option>
+              <option value="welding">Welding</option>
+              <option value="assembly">Assembly</option>
+              <option value="machining">Machining</option>
+              <option value="quality">Quality Control</option>
+              <option value="maintenance">Maintenance</option>
+            </select>
+
+            <select id="taskPriority" class="w-full border p-2 rounded-md">
+                <option value="">Priority</option>
+                <option value="High Priority">High Priority</option>
+                <option value="Medium Priority">Medium Priority</option>
+                <option value="Low Priority">Low Priority</option>
+            </select>
+            <textarea id="taskDescription" placeholder="Task description" class="w-full border p-2 rounded-md"></textarea>
+            <button onclick="assignTask()" class="bg-indigo-500 hover:bg-indigo-600 text-white w-full py-2 rounded-md">🤖 Auto-Assign Best Worker</button>
+          </div>
+        </section>
+      </div>
+
+      <div id="tasksSection" class="bg-white rounded-2xl p-5 shadow mt-6">
+        <h2 class="font-semibold text-lg mb-3">Recent Task Assignments</h2>
+        <div id="taskList" class="space-y-2"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WORKER DASHBOARD -->
+  <div id="workerDashboard" class="hidden min-h-screen text-gray-800 font-sans">
+    <!-- Header -->
+    <header class="flex justify-between items-center p-6 bg-white/70 shadow-lg backdrop-blur-md fade-in-up">
+      <h1 class="text-2xl font-bold text-indigo-800 flex items-center gap-2">
+        <i data-lucide="factory"></i>
+        👷‍♂ Worker Dashboard
+      </h1>
+      <button id="workerLogoutBtn" class="p-2 px-4 bg-indigo-300 rounded-full hover:bg-indigo-400 transition flex items-center gap-2 shadow-md">
+        <i data-lucide="log-out" class="text-indigo-900"></i>
+        <span class="font-semibold text-indigo-900">Logout</span>
+      </button>
+    </header>
+
+    <!-- Main Section -->
+    <main class="p-8 space-y-10">
+      <!-- Worker Details -->
+      <section class="fade-in-up card bg-white/70 backdrop-blur-lg rounded-2xl shadow-lg p-8 md:w-3/4 mx-auto flex flex-col md:flex-row items-center gap-8">
+        <div class="profile-container">
+          <img 
+            id="profile-image"
+            src="https://i.ibb.co/FYcP4W7/worker-profile.jpg" 
+            alt="Worker Photo" 
+            class="w-40 h-40 rounded-full object-cover shadow-md border-4 border-indigo-200 profile-pic"
+          >
+          <div class="profile-overlay">
+            <div class="profile-overlay-text">
+              <i data-lucide="camera" class="mx-auto mb-1"></i>
+              Change Photo
+            </div>
+          </div>
+          <div class="mt-4 upload-btn">
+            <button class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-full shadow-md transition flex items-center justify-center gap-2">
+              <i data-lucide="upload"></i>
+              Upload Your Photo
+            </button>
+            <input type="file" id="file-input" accept="image/*" class="cursor-pointer">
+          </div>
+        </div>
+        
+        <div class="space-y-2 text-sm md:text-base">
+          <h2 class="text-xl font-semibold text-indigo-800 flex items-center gap-2 mb-3">
+            <i data-lucide="id-card"></i> 🧾 Worker Details
+          </h2>
+          <p><b>👤 Name:</b> Ravi Kumar</p>
+          <p><b>📞 Phone:</b> +91 98765 43210</p>
+          <p><b>✉ Email:</b> ravi.kumar@tvsmotors.com</p>
+          <p><b>📅 Hired Date:</b> 12 March 2020</p>
+          <p><b>⚙ Working Skills:</b> CNC Machining, Maintenance, Assembly Operations</p>
+          <p><b>📍 Department:</b> Assembly Line</p>
+          <p><b>🆔 Employee ID:</b> TVS-EMP-2020-0456</p>
+        </div>
+      </section>
+
+      <!-- Tasks Section -->
+      <section class="grid md:grid-cols-2 gap-8">
+        <!-- Current Task -->
+        <div id="current-task" class="fade-in-up card bg-white/70 backdrop-blur-lg rounded-2xl shadow-lg p-6">
+          <h2 class="text-lg font-semibold text-indigo-800 flex items-center gap-2 mb-4">
+            <i data-lucide="clipboard-list"></i> 📋 Current Assigned Task
+          </h2>
+          <div id="task-card" class="bg-indigo-100 p-5 rounded-xl shadow-inner hover:bg-indigo-200 transition">
+            <div class="flex justify-between items-center">
+              <span id="task-title" class="font-medium">🔧 Perform CNC machining on Engine Block #E45</span>
+              <span id="task-status" class="text-sm text-gray-700">⏱ In Progress</span>
+            </div>
+            <div class="mt-3 text-sm text-gray-600">
+              <p>Deadline: 20 Oct 2025</p>
+              <p>Supervisor: Mr. S. Prakash</p>
+              <p>Priority: <span class="text-red-500 font-medium">High</span></p>
+            </div>
+            <button id="complete-btn" class="mt-4 bg-green-400 hover:bg-green-500 text-white font-semibold py-1.5 px-4 rounded-full shadow-md transition">
+              ✅ Mark as Completed
+            </button>
+          </div>
+        </div>
+
+        <!-- Completed Tasks -->
+        <div class="fade-in-up card bg-white/70 backdrop-blur-lg rounded-2xl shadow-lg p-6 delay-100">
+          <h2 class="text-lg font-semibold text-indigo-800 flex items-center gap-2 mb-4">
+            <i data-lucide="history"></i> ✅ Previous Completed Tasks
+          </h2>
+          <ul id="completed-tasks" class="space-y-3 text-sm">
+            <li class="flex justify-between bg-green-100 p-3 rounded-lg shadow-inner">
+              🚗 Assembly of Vehicle Frame #F21 <span class="text-green-700 font-medium">✔ Completed</span>
+            </li>
+            <li class="flex justify-between bg-green-100 p-3 rounded-lg shadow-inner">
+              🛠 Maintenance of Welding Robot #WR3 <span class="text-green-700 font-medium">✔ Completed</span>
+            </li>
+            <li class="flex justify-between bg-green-100 p-3 rounded-lg shadow-inner">
+              🔍 Quality Check for Engine Mount #E20 <span class="text-green-700 font-medium">✔ Completed</span>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Performance & Achievements -->
+      <section class="fade-in-up card bg-white/70 backdrop-blur-lg rounded-2xl shadow-lg p-8 md:w-3/4 mx-auto delay-200">
+        <h2 class="text-lg font-semibold text-indigo-800 flex items-center gap-2 mb-4">
+          <i data-lucide="trophy"></i> 🏆 Performance & Achievements
+        </h2>
+        <ul class="space-y-4 text-sm">
+          <li class="flex items-center gap-2">
+            🌟 <b>Outstanding Performer</b> — Recognized for top accuracy in CNC operations (2023)
+          </li>
+          <li class="flex items-center gap-2">
+            🔩 <b>Zero Defect Award</b> — 100% quality assurance for 6 continuous months
+          </li>
+          <li class="flex items-center gap-2">
+            ⚙ <b>Maintenance Champion</b> — Reduced machine downtime by 15%
+          </li>
+          <li class="flex items-center gap-2">
+            🏅 <b>Employee of the Month</b> — April 2024
+          </li>
+        </ul>
+        <div class="mt-6">
+          <p class="text-sm text-gray-700 mb-1">Overall Efficiency</p>
+          <div class="w-full bg-gray-200 rounded-full h-4">
+            <div class="bg-indigo-500 h-4 rounded-full w-[88%] animate-pulse"></div>
+          </div>
+          <p class="mt-1 text-right text-sm font-semibold text-indigo-700">88%</p>
+        </div>
+        
+        <div class="mt-6 grid grid-cols-2 gap-4">
+          <div class="bg-blue-50 p-4 rounded-lg">
+            <h3 class="font-semibold text-blue-800 mb-2">Skills</h3>
+            <div class="flex flex-wrap gap-2">
+              <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">CNC Machining</span>
+              <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Quality Control</span>
+              <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Assembly</span>
+              <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Maintenance</span>
+            </div>
+          </div>
+          <div class="bg-green-50 p-4 rounded-lg">
+            <h3 class="font-semibold text-green-800 mb-2">Certifications</h3>
+            <div class="flex flex-wrap gap-2">
+              <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">OSHA Safety</span>
+              <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">CNC Operator</span>
+              <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Quality Standards</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center text-xs text-gray-700 py-4 fade-in-up">
+      © 2025 Smart Workforce Intelligence System — Industry 4.0 Ready
+    </footer>
+  </div>
+
+  <script>
+    // Role Data
+    const roles = [
+      { 
+        id: 'worker', 
+        title: 'Worker Login', 
+        icon: 'users', 
+        description: 'Access your tasks, update progress, and track performance', 
+        image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop' 
+      },
+      { 
+        id: 'manager', 
+        title: 'Manager Login', 
+        icon: 'trending-up', 
+        description: 'Manage team, assign tasks, and monitor performance', 
+        image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop' 
+      },
+    ];
+
+    let selectedRole = 'worker';
+    const container = document.getElementById('roleCards');
+
+    // Render role cards
+    roles.forEach((role) => {
+      const div = document.createElement('div');
+      div.className = 'cursor-pointer rounded-xl p-6 bg-[#F5F5DC]/60 border-2 border-[#D3D3D3] role-card';
+      div.innerHTML = '<div class="mb-4 relative group"><div class="w-20 h-20 mx-auto rounded-full overflow-hidden border-4 border-[#D3D3D3] group-hover:border-[#C3CDE6] transition-all duration-300"><img src="' + role.image + '" alt="' + role.title + '" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300"/></div><div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 p-2 rounded-full bg-[#D3D3D3]"><i data-lucide="' + role.icon + '" class="w-4 h-4 text-gray-800"></i></div></div><h3 class="text-xl font-bold text-gray-800 mb-2 text-center">' + role.title + '</h3><p class="text-sm text-gray-600 mb-4 text-center">' + role.description + '</p>';
+      div.addEventListener('click', () => {
+        selectedRole = role.id;
+        document.getElementById('loginBtn').textContent = 'Login as ' + role.title.replace(' Login', '');
+      });
+      container.appendChild(div);
+    });
+    lucide.createIcons();
+
+    // Login functionality
+    document.getElementById('loginBtn').onclick = () => {
+      const username = document.getElementById('username').value;
+      if (!username) {
+        alert('Please enter a username');
+        return;
+      }
+
+      if (selectedRole === 'manager') {
+        document.getElementById('loginPage').classList.add('hidden');
+        document.getElementById('managerDashboard').classList.remove('hidden');
+        document.getElementById('workerDashboard').classList.add('hidden');
+      } else {
+        document.getElementById('loginPage').classList.add('hidden');
+        document.getElementById('workerDashboard').classList.remove('hidden');
+        document.getElementById('managerDashboard').classList.add('hidden');
+      }
+    };
+
+    // Logout functionality
+    document.getElementById('managerLogoutBtn').onclick = () => {
+      document.getElementById('managerDashboard').classList.add('hidden');
+      document.getElementById('loginPage').classList.remove('hidden');
+    };
+
+    document.getElementById('workerLogoutBtn').onclick = () => {
+      document.getElementById('workerDashboard').classList.add('hidden');
+      document.getElementById('loginPage').classList.remove('hidden');
+    };
+
+    // Tab functionality for manager dashboard
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const target = document.querySelector(tab.dataset.target);
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+
+    // Manager Dashboard Data
+    const workers = [
+      { name: 'Sarah Johnson', role: 'Welding Specialist', status: 'available', skills: ['welding'], exp: 8 },
+      { name: 'Mike Chen', role: 'Assembly Technician', status: 'available', skills: ['assembly'], exp: 5 },
+      { name: 'Emily Rodriguez', role: 'Machine Operator', status: 'busy', skills: ['machining'], exp: 6 },
+      { name: 'David Kumar', role: 'Quality Inspector', status: 'available', skills: ['quality'], exp: 10 },
+      { name: 'Lisa Thompson', role: 'Maintenance Tech', status: 'available', skills: ['maintenance'], exp: 7 },
+    ];
+    let recentTasks = [];
+
+    function renderWorkers() {
+      const list = document.getElementById('workerList');
+      let html = '';
+      workers.forEach(w => {
+        const statusClass = w.status == 'available' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700';
+        const initials = w.name.split(' ').map(n => n[0]).join('');
+        html += '<div class="flex items-center gap-3 bg-gray-100 p-3 rounded-lg hover:bg-indigo-100"><div class="bg-indigo-500 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold">' + initials + '</div><div class="flex-1"><div class="font-semibold">' + w.name + '</div><div class="text-sm text-gray-500">' + w.role + ' • ' + w.exp + ' yrs exp</div></div><span class="text-xs px-2 py-1 rounded-full ' + statusClass + '">' + w.status + '</span></div>';
+      });
+      list.innerHTML = html;
+      document.getElementById('availableWorkers').textContent = workers.filter(w => w.status === 'available').length;
+    }
+
+    function renderTasks() {
+      const taskList = document.getElementById('taskList');
+      if (recentTasks.length) {
+        let html = '';
+        recentTasks.forEach(t => {
+          html += '<div class="bg-gray-100 p-3 rounded-md border-l-4 border-indigo-400"><div class="font-semibold">' + t.name + '</div><div class="text-xs text-gray-500 flex justify-between"><span>👷 ' + t.worker + '</span><span>' + t.time + '</span></div></div>';
+        });
+        taskList.innerHTML = html;
+      } else {
+        taskList.innerHTML = '<p class="text-gray-500 text-center py-4">No tasks assigned yet</p>';
+      }
+      document.getElementById('activeTasks').textContent = recentTasks.length;
+    }
+
+    function assignTask() {
+      const name = document.getElementById('taskName').value;
+      const skill = document.getElementById('taskSkill').value;
+      if (!name || !skill) return alert('Enter task name and skill');
+      const available = workers.filter(w => w.status == 'available' && w.skills.includes(skill));
+      if (!available.length) return alert('No available workers with this skill');
+      const best = available.sort((a,b)=>b.exp-a.exp)[0];
+      best.status = 'busy';
+      recentTasks.unshift({ name, worker: best.name, time: new Date().toLocaleTimeString() });
+      renderWorkers(); renderTasks();
+      document.getElementById('taskName').value = ''; 
+      document.getElementById('taskDescription').value = ''; 
+      alert('✅ Task "' + name + '" assigned to ' + best.name);
+    }
+
+    // Worker Dashboard Functionality
+    const completeBtn = document.getElementById('complete-btn');
+    const taskCard = document.getElementById('task-card');
+    const completedList = document.getElementById('completed-tasks');
+    const taskTitle = document.getElementById('task-title');
+    const fileInput = document.getElementById('file-input');
+    const profileImage = document.getElementById('profile-image');
+    const profileContainer = document.querySelector('.profile-container');
+
+    // Task completion functionality
+    completeBtn.addEventListener('click', () => {
+      taskCard.classList.add('fade-out-up');
+      
+      setTimeout(() => {
+        const newTask = document.createElement('li');
+        newTask.className = "flex justify-between bg-green-100 p-3 rounded-lg shadow-inner";
+        newTask.innerHTML = taskTitle.textContent + ' <span class="text-green-700 font-medium">✔ Completed</span>';
+        completedList.prepend(newTask);
+
+        taskCard.innerHTML = '<p class="text-gray-600 italic text-center py-6">🎉 No current tasks assigned.</p>';
+      }, 700);
+    });
+
+    // Image upload functionality
+    fileInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          profileImage.src = e.target.result;
+          
+          // Show success message
+          const originalText = document.querySelector('.upload-btn button').innerHTML;
+          document.querySelector('.upload-btn button').innerHTML = '<i data-lucide="check" class="text-white"></i> Photo Updated!';
+          document.querySelector('.upload-btn button').classList.remove('bg-indigo-500', 'hover:bg-indigo-600');
+          document.querySelector('.upload-btn button').classList.add('bg-green-500', 'hover:bg-green-600');
+          
+          // Revert button after 2 seconds
+          setTimeout(() => {
+            document.querySelector('.upload-btn button').innerHTML = originalText;
+            document.querySelector('.upload-btn button').classList.remove('bg-green-500', 'hover:bg-green-600');
+            document.querySelector('.upload-btn button').classList.add('bg-indigo-500', 'hover:bg-indigo-600');
+            lucide.createIcons();
+          }, 2000);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Click on profile image to trigger file input
+    profileContainer.addEventListener('click', function() {
+      fileInput.click();
+    });
+
+    // Initialize manager dashboard
+    renderWorkers(); 
+    renderTasks();
+  </script>
+</body>
+</html>
